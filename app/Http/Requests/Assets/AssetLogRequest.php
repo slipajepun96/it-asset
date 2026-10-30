@@ -23,6 +23,8 @@ class AssetLogRequest extends FormRequest
                 'exists:locations,id',
             ],
             'logged_at' => ['nullable', 'date'],
+            'attachments' => ['nullable', 'array', 'max:5'],
+            'attachments.*' => ['file', 'mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx', 'max:10240'],
         ];
     }
 }

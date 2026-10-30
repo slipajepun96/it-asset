@@ -3,6 +3,7 @@ import { Download, Pencil, Printer, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { DatePicker } from '@/components/date-picker';
 import InputError from '@/components/input-error';
+import { LogAttachments } from '@/components/log-attachments';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +16,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { label } from '@/lib/asset-ui';
-import type { AssetSummary, Option } from '@/lib/asset-ui';
+import type { AssetSummary, Attachment, Option } from '@/lib/asset-ui';
 import { destroy, edit, index, invoice, label as labelRoute, qr, show, status as statusRoute } from '@/routes/assets';
 import { store as storeLog } from '@/routes/assets/logs';
 
@@ -34,6 +35,7 @@ type Log = {
     location: string | null;
     user: string | null;
     logged_at: string;
+    attachments: Attachment[];
 };
 
 type Props = {
@@ -52,11 +54,11 @@ export default function AssetShow({ asset, logs, locations, logTypes, statuses }
             <Head title={asset.name} />
             <div className="space-y-6 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                        <h1 className="text-xl font-semibold">{asset.name}</h1>
-                        <p className="text-muted-foreground font-mono text-xs">{asset.id}</p>
+                    <div className="min-w-0">
+                        <h1 className="text-xl font-semibold break-words">{asset.name}</h1>
+                        <p className="text-muted-foreground font-mono text-xs break-all">{asset.id}</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         <Button variant="outline" asChild>
                             <Link href={edit(asset.id)}>
                                 <Pencil /> Edit
@@ -75,7 +77,7 @@ export default function AssetShow({ asset, logs, locations, logTypes, statuses }
                 </div>
 
                 <div className="grid gap-6 lg:grid-cols-3">
-                    <section className="space-y-3 rounded-xl border p-4 lg:col-span-2">
+                    <section className="min-w-0 space-y-3 rounded-xl border p-4 lg:col-span-2">
                         <h2 className="font-medium">Details</h2>
                         <dl className="grid gap-3 text-sm sm:grid-cols-2">
                             <Item name="Asset number" value={asset.asset_number} />
@@ -98,7 +100,7 @@ export default function AssetShow({ asset, logs, locations, logTypes, statuses }
                                             )
                                         }
                                     >
-                                        <SelectTrigger className="mt-1 w-48">
+                                        <SelectTrigger className="mt-1 w-full sm:w-48">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -211,6 +213,26 @@ export default function AssetShow({ asset, logs, locations, logTypes, statuses }
                                     />
                                     <InputError message={errors.description} />
                                 </div>
+                                <div className="grid gap-2 sm:col-span-2">
+                                    <Label>Attachments (optional)</Label>
+                                    <Input
+                                        name="attachments[]"
+                                        type="file"
+                                        multiple
+                                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
+                                    />
+                                    <p className="text-muted-foreground text-xs">
+                                        Service reports, repair invoices, photos. Up to 5 files, 10 MB each.
+                                    </p>
+                                    <InputError
+                                        message={
+                                            errors.attachments ??
+                                            Object.entries(errors).find(([k]) =>
+                                                k.startsWith('attachments.'),
+                                            )?.[1]
+                                        }
+                                    />
+                                </div>
                                 <div>
                                     <Button disabled={processing}>Add entry</Button>
                                 </div>
@@ -234,9 +256,10 @@ export default function AssetShow({ asset, logs, locations, logTypes, statuses }
                                         {l.user && ` · ${l.user}`}
                                     </span>
                                     {l.location && <span>→ {l.location}</span>}
-                                    {l.cost && <span className="ml-auto">Cost: {l.cost}</span>}
+                                    {l.cost && <span className="sm:ml-auto">Cost: {l.cost}</span>}
                                 </div>
-                                <p className="mt-2 whitespace-pre-wrap">{l.description}</p>
+                                <p className="mt-2 break-words whitespace-pre-wrap">{l.description}</p>
+                                <LogAttachments files={l.attachments} />
                             </li>
                         ))}
                     </ol>
@@ -248,9 +271,9 @@ export default function AssetShow({ asset, logs, locations, logTypes, statuses }
 
 function Item({ name, value }: { name: string; value?: string | null }) {
     return (
-        <div>
+        <div className="min-w-0">
             <dt className="text-muted-foreground">{name}</dt>
-            <dd>{value || '—'}</dd>
+            <dd className="break-words">{value || '—'}</dd>
         </div>
     );
 }

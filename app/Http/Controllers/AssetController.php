@@ -71,30 +71,17 @@ class AssetController extends Controller
 
     public function show(Asset $asset): InertiaResponse
     {
-        $asset->load(['supplier', 'location', 'logs.user:id,name', 'logs.location:id,name']);
-
         return Inertia::render('assets/show', [
-            'asset' => [
-                ...$this->summary($asset),
-                'purchase_date' => $asset->purchase_date?->toDateString(),
-                'price' => $asset->price,
-                'supplier' => $asset->supplier?->only('id', 'name', 'contact'),
-                'has_invoice' => $asset->invoice_path !== null,
-                'url' => route('assets.show', $asset),
-            ],
-            'logs' => $asset->logs->map(fn ($log) => [
-                'id' => $log->id,
-                'type' => $log->type->value,
-                'description' => $log->description,
-                'cost' => $log->cost,
-                'location' => $log->location?->name,
-                'user' => $log->user?->name,
-                'logged_at' => $log->logged_at->toIso8601String(),
-            ]),
+            ...$this->details($asset),
             'locations' => Location::orderBy('name')->get(['id', 'name']),
             'logTypes' => array_column(LogType::cases(), 'value'),
             'statuses' => array_column(AssetStatus::cases(), 'value'),
         ]);
+    }
+
+    public function publicShow(Asset $asset): InertiaResponse
+    {
+        return Inertia::render('public/asset', $this->details($asset));
     }
 
     public function edit(Asset $asset): InertiaResponse
@@ -139,6 +126,7 @@ class AssetController extends Controller
         if ($asset->invoice_path) {
             Storage::delete($asset->invoice_path);
         }
+        Storage::delete($asset->logs()->with('attachments')->get()->flatMap->attachments->pluck('path')->all());
         $asset->delete();
 
         return to_route('assets.index');
@@ -154,7 +142,7 @@ class AssetController extends Controller
     public function qr(Asset $asset): Response
     {
         $writer = new Writer(new ImageRenderer(new RendererStyle(320, 1), new SvgImageBackEnd));
-        $svg = $writer->writeString(route('assets.show', $asset));
+        $svg = $writer->writeString(route('assets.public', $asset));
 
         return response($svg, 200, [
             'Content-Type' => 'image/svg+xml',
@@ -181,6 +169,35 @@ class AssetController extends Controller
                 ->orderBy('name')
                 ->get(['id', 'name', 'asset_number', 'serial_number']),
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function details(Asset $asset): array
+    {
+        $asset->load(['supplier', 'location', 'logs.user:id,name', 'logs.location:id,name', 'logs.attachments']);
+
+        return [
+            'asset' => [
+                ...$this->summary($asset),
+                'purchase_date' => $asset->purchase_date?->toDateString(),
+                'price' => $asset->price,
+                'supplier' => $asset->supplier?->only('id', 'name', 'contact'),
+                'has_invoice' => $asset->invoice_path !== null,
+                'url' => route('assets.public', $asset),
+            ],
+            'logs' => $asset->logs->map(fn ($log) => [
+                'id' => $log->id,
+                'type' => $log->type->value,
+                'description' => $log->description,
+                'cost' => $log->cost,
+                'location' => $log->location?->name,
+                'user' => $log->user?->name,
+                'logged_at' => $log->logged_at->toIso8601String(),
+                'attachments' => $log->attachments->map->only('id', 'name', 'size'),
+            ]),
+        ];
     }
 
     /**

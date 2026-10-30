@@ -57,7 +57,7 @@ export default function AssetsIndex({ assets, filters, locations, statuses }: Pr
             <div className="space-y-4 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                     <h1 className="text-xl font-semibold">Assets</h1>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                         <Button
                             variant="outline"
                             disabled={selected.length === 0}
@@ -81,7 +81,7 @@ export default function AssetsIndex({ assets, filters, locations, statuses }: Pr
                     }}
                 >
                     <Input
-                        className="max-w-xs"
+                        className="w-full sm:max-w-xs"
                         placeholder="Search name, asset no., serial or UUID"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -92,7 +92,7 @@ export default function AssetsIndex({ assets, filters, locations, statuses }: Pr
                             apply({ status: status === '__all__' ? undefined : status })
                         }
                     >
-                        <SelectTrigger className="w-40">
+                        <SelectTrigger className="w-full sm:w-40">
                             <SelectValue placeholder="All statuses" />
                         </SelectTrigger>
                         <SelectContent>
@@ -110,7 +110,7 @@ export default function AssetsIndex({ assets, filters, locations, statuses }: Pr
                             apply({ location_id: locationId === '__all__' ? undefined : locationId })
                         }
                     >
-                        <SelectTrigger className="w-48">
+                        <SelectTrigger className="w-full sm:w-48">
                             <SelectValue placeholder="All locations" />
                         </SelectTrigger>
                         <SelectContent>
@@ -122,13 +122,62 @@ export default function AssetsIndex({ assets, filters, locations, statuses }: Pr
                             ))}
                         </SelectContent>
                     </Select>
-                    <Button type="submit" variant="secondary">
+                    <Button type="submit" variant="secondary" className="w-full sm:w-auto">
                         Search
                     </Button>
                 </form>
 
-                <div className="overflow-x-auto rounded-xl border">
-                    <table className="w-full text-sm">
+                {/* Phones and tablets: one card per asset. */}
+                <div className="space-y-2 lg:hidden">
+                    {assets.data.length > 0 && (
+                        <label className="flex items-center gap-2 px-1 text-sm">
+                            <Checkbox
+                                checked={allSelected}
+                                onCheckedChange={(c) => toggleAll(c === true)}
+                            />
+                            Select all on this page
+                        </label>
+                    )}
+                    {assets.data.map((a) => (
+                        <div key={a.id} className="flex items-start gap-3 rounded-xl border p-3 text-sm">
+                            <Checkbox
+                                className="mt-0.5"
+                                aria-label={`Select ${a.name}`}
+                                checked={selected.includes(a.id)}
+                                onCheckedChange={(c) => toggle(a.id, c === true)}
+                            />
+                            <div className="min-w-0 flex-1 space-y-1">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <Link
+                                        href={show(a.id)}
+                                        className="min-w-0 font-medium break-words hover:underline"
+                                    >
+                                        {a.name}
+                                    </Link>
+                                    <Badge variant="outline">{label(a.status)}</Badge>
+                                </div>
+                                <div className="text-muted-foreground break-words">
+                                    {[a.asset_number, a.category, a.location?.name]
+                                        .filter(Boolean)
+                                        .join(' · ') || '—'}
+                                </div>
+                                {a.serial_number && (
+                                    <div className="text-muted-foreground text-xs break-all">
+                                        S/N {a.serial_number}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                    {assets.data.length === 0 && (
+                        <p className="text-muted-foreground rounded-xl border p-6 text-center text-sm">
+                            No assets found.
+                        </p>
+                    )}
+                </div>
+
+                <div className="hidden rounded-xl border lg:block">
+                    <table className="w-full text-sm break-words">
                         <thead className="bg-muted/50 text-left">
                             <tr>
                                 <th className="w-10 p-3">

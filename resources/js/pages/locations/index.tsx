@@ -26,7 +26,7 @@ export default function Locations({ locations, types }: Props) {
                 <Form {...store.form()} resetOnSuccess className="flex flex-wrap items-start gap-2">
                     {({ errors, processing }) => (
                         <>
-                            <div>
+                            <div className="w-full sm:w-auto">
                                 <Input name="name" placeholder="e.g. Head Office, Estate A" required />
                                 <InputError message={errors.name} />
                             </div>
@@ -35,7 +35,7 @@ export default function Locations({ locations, types }: Props) {
                                 defaultValue=""
                                 required
                             >
-                                <SelectTrigger className="w-36">
+                                <SelectTrigger className="w-full sm:w-36">
                                     <SelectValue placeholder="Select type" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -46,15 +46,15 @@ export default function Locations({ locations, types }: Props) {
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <Input name="address" placeholder="Address (optional)" className="w-64" />
-                            <Button disabled={processing}>Add</Button>
+                            <Input name="address" placeholder="Address (optional)" className="w-full sm:w-64" />
+                            <Button disabled={processing} className="w-full sm:w-auto">Add</Button>
                         </>
                     )}
                 </Form>
                 <ul className="divide-y rounded-xl border">
                     {locations.map((l) => (
-                        <li key={l.id} className="flex items-center justify-between p-3 text-sm">
-                            <div>
+                        <li key={l.id} className="flex items-center justify-between gap-2 p-3 text-sm">
+                            <div className="min-w-0 break-words">
                                 <div className="font-medium">
                                     {l.name} <span className="text-muted-foreground">({label(l.type)})</span>
                                 </div>

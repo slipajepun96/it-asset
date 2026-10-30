@@ -43,7 +43,7 @@ export default function AssetForm({ asset, suppliers, locations, statuses }: Pro
         <>
             <Head title={asset ? 'Edit asset' : 'New asset'} />
             <div className="max-w-2xl space-y-6 p-4">
-                <h1 className="text-xl font-semibold">
+                <h1 className="text-xl font-semibold break-words">
                     {asset ? `Edit ${asset.name}` : 'New asset'}
                 </h1>
 
@@ -157,7 +157,7 @@ export default function AssetForm({ asset, suppliers, locations, statuses }: Pro
                                 />
                             </Field>
 
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap gap-2">
                                 <Button disabled={processing}>
                                     {asset ? 'Save changes' : 'Create asset'}
                                 </Button>

@@ -15,11 +15,11 @@ type Props = { assets: LabelAsset[] };
 
 function Label({ asset }: { asset: LabelAsset }) {
     return (
-        <div className="label-card flex w-72 flex-col items-center gap-2 rounded border border-black p-4 text-center text-black">
+        <div className="label-card flex w-full max-w-72 flex-col items-center gap-2 rounded border border-black p-4 text-center text-black">
             <img src={qr.url(asset.id)} alt="QR code" className="size-52" />
             {asset.asset_number && <div className="text-lg font-bold">{asset.asset_number}</div>}
-            <div className="font-semibold">{asset.name}</div>
-            {asset.serial_number && <div className="text-xs">S/N {asset.serial_number}</div>}
+            <div className="font-semibold break-words">{asset.name}</div>
+            {asset.serial_number && <div className="text-xs break-all">S/N {asset.serial_number}</div>}
             <div className="font-mono text-[8px] break-all">{asset.id}</div>
         </div>
     );
@@ -51,7 +51,7 @@ export default function AssetLabel({ assets }: Props) {
                     .label-card img { width: 46mm; height: 46mm; }
                 }
             `}</style>
-            <div className="flex flex-col items-center gap-4 p-6">
+            <div className="flex flex-col items-center gap-4 p-4">
                 <Button onClick={() => window.print()}>
                     Print {assets.length === 1 ? 'label' : `${assets.length} labels`}
                 </Button>

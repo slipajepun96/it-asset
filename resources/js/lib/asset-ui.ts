@@ -16,3 +16,5 @@ export type AssetSummary = {
     location: Option | null;
     supplier: Option | null;
 };
+
+export type Attachment = { id: number; name: string; size: number };

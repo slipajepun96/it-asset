@@ -17,19 +17,19 @@ export default function Suppliers({ suppliers }: Props) {
                 <Form {...store.form()} resetOnSuccess className="flex flex-wrap items-start gap-2">
                     {({ errors, processing }) => (
                         <>
-                            <div>
+                            <div className="w-full sm:w-auto">
                                 <Input name="name" placeholder="Supplier name" required />
                                 <InputError message={errors.name} />
                             </div>
-                            <Input name="contact" placeholder="Contact (email / phone)" className="w-64" />
-                            <Button disabled={processing}>Add</Button>
+                            <Input name="contact" placeholder="Contact (email / phone)" className="w-full sm:w-64" />
+                            <Button disabled={processing} className="w-full sm:w-auto">Add</Button>
                         </>
                     )}
                 </Form>
                 <ul className="divide-y rounded-xl border">
                     {suppliers.map((s) => (
-                        <li key={s.id} className="flex items-center justify-between p-3 text-sm">
-                            <div>
+                        <li key={s.id} className="flex items-center justify-between gap-2 p-3 text-sm">
+                            <div className="min-w-0 break-words">
                                 <div className="font-medium">{s.name}</div>
                                 <div className="text-muted-foreground">
                                     {s.contact ?? '—'} · {s.assets_count} assets
