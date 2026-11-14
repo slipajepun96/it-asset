@@ -1,5 +1,6 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { BarChart3, Boxes, History, LayoutGrid, MapPin, Printer, Settings2, Truck, Users } from 'lucide-react';
+import { useEffect } from 'react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -11,6 +12,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from '@/components/ui/sidebar';
 import { dashboard, home } from '@/routes';
 import { index as assetsIndex } from '@/routes/assets';
@@ -41,6 +43,10 @@ export function AppSidebar() {
         { title: 'Photostat report', href: photostatReport(), icon: BarChart3 },
         { title: 'People', href: usersIndex(), icon: Users, badge: auth.pendingCount },
     ];
+
+    // On phones the sidebar is a sheet over the page: close it as soon as any link in it is tapped.
+    const { setOpenMobile } = useSidebar();
+    useEffect(() => router.on('start', () => setOpenMobile(false)), [setOpenMobile]);
 
     return (
         <Sidebar collapsible="icon" variant="inset">
