@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use GuzzleHttp\Client;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,7 +39,12 @@ class GoogleAuthController extends Controller
         }
 
         try {
-            $google = Socialite::driver('google')->redirectUrl(url(config('services.google.redirect')))->user();
+            // Verify Google's SSL certificate with the CA bundle shipped in the project, so the
+            // token exchange works even when the server's php.ini has no curl.cainfo (e.g. PHP on Windows).
+            $google = Socialite::driver('google')
+                ->redirectUrl(url(config('services.google.redirect')))
+                ->setHttpClient(new Client(['verify' => resource_path('certs/cacert.pem'), 'timeout' => 15]))
+                ->user();
         } catch (InvalidStateException) {
             return $this->fail('The sign-in session expired. Please try again.');
         } catch (Throwable $e) {

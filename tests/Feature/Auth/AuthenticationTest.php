@@ -28,6 +28,7 @@ class AuthenticationTest extends TestCase
         $user->user = ['email_verified' => true];
         $provider = Mockery::mock(GoogleProvider::class);
         $provider->shouldReceive('redirectUrl')->andReturnSelf();
+        $provider->shouldReceive('setHttpClient')->andReturnSelf();
         $provider->shouldReceive('user')->andReturn($user);
         Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
     }
