@@ -73,6 +73,7 @@ class AssetController extends Controller
     {
         return Inertia::render('assets/show', [
             ...$this->details($asset),
+            'photostat' => $this->photostat($asset),
             'locations' => Location::orderBy('name')->get(['id', 'name']),
             'logTypes' => array_column(LogType::cases(), 'value'),
             'statuses' => array_column(AssetStatus::cases(), 'value'),
@@ -169,6 +170,30 @@ class AssetController extends Controller
                 ->orderBy('name')
                 ->get(['id', 'name', 'asset_number', 'serial_number']),
         ]);
+    }
+
+    /**
+     * The photostat machine linked to this asset, with this month's usage and the latest meter check.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function photostat(Asset $asset): ?array
+    {
+        $machine = $asset->photostatMachine;
+        if (! $machine) {
+            return null;
+        }
+
+        $month = $machine->records()->where('created_at', '>=', now()->startOfMonth());
+        $check = $machine->readings()->where('is_initial', false)->latest('id')->first();
+
+        return [
+            ...$machine->only('id', 'name', 'bw_counter', 'color_counter', 'active'),
+            'month_bw' => (int) (clone $month)->sum('bw'),
+            'month_color' => (int) (clone $month)->sum('color'),
+            'month_records' => (clone $month)->count(),
+            'last_check' => $check?->toListItem(),
+        ];
     }
 
     /**

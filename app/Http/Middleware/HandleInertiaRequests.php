@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\UserStatus;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -40,6 +42,11 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                'isAdmin' => (bool) $request->user()?->isAdmin(),
+                // Sign-in requests waiting for an admin (shown as a badge on People).
+                'pendingCount' => fn () => $request->user()?->isAdmin()
+                    ? User::where('status', UserStatus::Pending)->count()
+                    : 0,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

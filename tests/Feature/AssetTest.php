@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class AssetTest extends TestCase
@@ -25,7 +26,7 @@ class AssetTest extends TestCase
         Storage::fake();
         $supplier = Supplier::create(['name' => 'Acme']);
 
-        $this->actingAs(User::factory()->create())->post(route('assets.store'), [
+        $this->actingAs(User::factory()->admin()->create())->post(route('assets.store'), [
             'name' => 'Dell Latitude',
             'serial_number' => 'SN123',
             'price' => '2500.50',
@@ -34,7 +35,7 @@ class AssetTest extends TestCase
         ])->assertRedirect();
 
         $asset = Asset::firstOrFail();
-        $this->assertTrue(\Illuminate\Support\Str::isUuid($asset->id));
+        $this->assertTrue(Str::isUuid($asset->id));
         Storage::assertExists($asset->invoice_path);
 
         $this->get(route('assets.invoice', $asset))->assertOk();
@@ -59,7 +60,7 @@ class AssetTest extends TestCase
         $old = UploadedFile::fake()->create('old.pdf', 10, 'application/pdf')->store('invoices');
         $asset = Asset::create(['name' => 'Router', 'asset_number' => 'IT-001', 'invoice_path' => $old]);
         $supplier = Supplier::create(['name' => 'Acme']);
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)->get(route('assets.edit', $asset))->assertOk();
 
@@ -90,7 +91,7 @@ class AssetTest extends TestCase
     {
         $asset = Asset::create(['name' => 'Router']);
         $estate = Location::create(['name' => 'Estate A', 'type' => 'estate']);
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)->post(route('assets.logs.store', $asset), [
             'type' => 'relocation', 'description' => 'Moved to estate',
@@ -108,7 +109,7 @@ class AssetTest extends TestCase
     {
         Storage::fake();
         $asset = Asset::create(['name' => 'Laptop']);
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)->post(route('assets.logs.store', $asset), [
             'type' => 'maintenance',
@@ -144,7 +145,7 @@ class AssetTest extends TestCase
     {
         $asset = Asset::create(['name' => 'Printer']);
 
-        $this->actingAs(User::factory()->create())->post(route('assets.logs.store', $asset), [
+        $this->actingAs(User::factory()->admin()->create())->post(route('assets.logs.store', $asset), [
             'type' => 'problem', 'description' => 'Paper jam', 'cost' => '10',
         ])->assertRedirect();
 

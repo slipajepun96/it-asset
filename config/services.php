@@ -18,6 +18,14 @@ return [
         'key' => env('POSTMARK_API_KEY'),
     ],
 
+    // Sign in with Google. ADMIN_EMAIL's account becomes an active admin on its first sign-in.
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
+        'admin_email' => env('ADMIN_EMAIL'),
+    ],
+
     'resend' => [
         'key' => env('RESEND_API_KEY'),
     ],

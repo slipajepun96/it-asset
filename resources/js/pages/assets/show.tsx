@@ -19,6 +19,61 @@ import { label } from '@/lib/asset-ui';
 import type { AssetSummary, Attachment, Option } from '@/lib/asset-ui';
 import { destroy, edit, index, invoice, label as labelRoute, qr, show, status as statusRoute } from '@/routes/assets';
 import { store as storeLog } from '@/routes/assets/logs';
+import { Diff } from '@/components/photostat/parts';
+import { fmtDateTime, fmtNum } from '@/lib/photostat';
+import type { MeterReading } from '@/lib/photostat';
+import { index as photostatMachines } from '@/routes/photostat/admin/machines';
+import { report as photostatReport } from '@/routes/photostat/admin';
+
+type PhotostatSummary = {
+    id: number;
+    name: string;
+    bw_counter: number;
+    color_counter: number;
+    active: boolean;
+    month_bw: number;
+    month_color: number;
+    month_records: number;
+    last_check: MeterReading | null;
+};
+
+/** This asset is a photostat machine: its print count, this month's usage and the latest meter check. */
+function PhotostatCard({ machine }: { machine: PhotostatSummary }) {
+    return (
+        <section className="space-y-3 rounded-xl border p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="flex items-center gap-2 font-medium">
+                    <Printer className="size-4" /> Photostat: {machine.name}
+                    {!machine.active && <Badge variant="secondary">Hidden</Badge>}
+                </h2>
+                <div className="flex gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href={photostatReport({ query: { machine_id: machine.id } })}>Report</Link>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href={photostatMachines()}>Meter readings</Link>
+                    </Button>
+                </div>
+            </div>
+            <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+                <div><dt className="text-muted-foreground">B&amp;W count</dt><dd className="font-mono text-lg">{fmtNum(machine.bw_counter)}</dd></div>
+                <div><dt className="text-muted-foreground">Colour count</dt><dd className="font-mono text-lg">{fmtNum(machine.color_counter)}</dd></div>
+                <div><dt className="text-muted-foreground">This month</dt><dd>{fmtNum(machine.month_bw)} B&amp;W · {fmtNum(machine.month_color)} colour</dd></div>
+                <div><dt className="text-muted-foreground">Records this month</dt><dd>{fmtNum(machine.month_records)}</dd></div>
+            </dl>
+            <div className="text-sm">
+                {machine.last_check ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-muted-foreground">Last meter check {fmtDateTime(machine.last_check.created_at)}:</span>
+                        B&amp;W <Diff value={machine.last_check.bw_diff} /> Colour <Diff value={machine.last_check.color_diff} />
+                    </div>
+                ) : (
+                    <span className="text-muted-foreground">No meter check yet.</span>
+                )}
+            </div>
+        </section>
+    );
+}
 
 type Asset = AssetSummary & {
     purchase_date: string | null;
@@ -44,9 +99,10 @@ type Props = {
     locations: Option[];
     logTypes: string[];
     statuses: string[];
+    photostat: PhotostatSummary | null;
 };
 
-export default function AssetShow({ asset, logs, locations, logTypes, statuses }: Props) {
+export default function AssetShow({ asset, logs, locations, logTypes, statuses, photostat }: Props) {
     const [type, setType] = useState('problem');
 
     return (
@@ -143,6 +199,8 @@ export default function AssetShow({ asset, logs, locations, logTypes, statuses }
                         </Button>
                     </section>
                 </div>
+
+                {photostat && <PhotostatCard machine={photostat} />}
 
                 <section className="space-y-4 rounded-xl border p-4">
                     <h2 className="font-medium">Add history entry</h2>

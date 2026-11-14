@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Asset extends Model
 {
@@ -40,5 +41,11 @@ class Asset extends Model
     public function logs(): HasMany
     {
         return $this->hasMany(AssetLog::class)->latest('logged_at')->latest('id');
+    }
+
+    /** The photostat machine this asset is, if any. @return HasOne<PhotostatMachine, $this> */
+    public function photostatMachine(): HasOne
+    {
+        return $this->hasOne(PhotostatMachine::class);
     }
 }

@@ -1,7 +1,6 @@
-import { Link } from '@inertiajs/react';
-import { BookOpen, Boxes, FolderGit2, LayoutGrid, MapPin, Truck } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { BarChart3, Boxes, History, LayoutGrid, MapPin, Printer, Settings2, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -13,44 +12,43 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { dashboard, home } from '@/routes';
 import { index as assetsIndex } from '@/routes/assets';
 import { index as locationsIndex } from '@/routes/locations';
+import { index as photostatIndex, mine as photostatMine } from '@/routes/photostat';
+import { report as photostatReport } from '@/routes/photostat/admin';
+import { index as photostatMachines } from '@/routes/photostat/admin/machines';
 import { index as suppliersIndex } from '@/routes/suppliers';
+import { index as usersIndex } from '@/routes/users';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    { title: 'Assets', href: assetsIndex(), icon: Boxes },
-    { title: 'Locations', href: locationsIndex(), icon: MapPin },
-    { title: 'Suppliers', href: suppliersIndex(), icon: Truck },
-];
-
-const footerNavItems: NavItem[] = [
-    // {
-    //     title: 'Repository',
-    //     href: 'https://github.com/laravel/react-starter-kit',
-    //     icon: FolderGit2,
-    // },
-    // {
-    //     title: 'Documentation',
-    //     href: 'https://laravel.com/docs/starter-kits#react',
-    //     icon: BookOpen,
-    // },
+const photostatItems: NavItem[] = [
+    { title: 'Record prints', href: photostatIndex(), icon: Printer },
+    { title: 'My records', href: photostatMine(), icon: History },
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage<{ auth: { isAdmin: boolean; pendingCount: number } }>().props;
+
+    const assetItems: NavItem[] = [
+        { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+        { title: 'Assets', href: assetsIndex(), icon: Boxes },
+        { title: 'Locations', href: locationsIndex(), icon: MapPin },
+        { title: 'Suppliers', href: suppliersIndex(), icon: Truck },
+    ];
+    const adminItems: NavItem[] = [
+        { title: 'Machine & readings', href: photostatMachines(), icon: Settings2 },
+        { title: 'Photostat report', href: photostatReport(), icon: BarChart3 },
+        { title: 'People', href: usersIndex(), icon: Users, badge: auth.pendingCount },
+    ];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <Link href={home()} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
@@ -59,11 +57,12 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                {auth.isAdmin && <NavMain label="IT assets" items={assetItems} />}
+                <NavMain label="Photostat" items={photostatItems} />
+                {auth.isAdmin && <NavMain label="Admin" items={adminItems} />}
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

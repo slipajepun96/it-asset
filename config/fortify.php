@@ -160,11 +160,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
-        Features::resetPasswords(),
-        Features::passkeys([
-            'confirmPassword' => true,
-        ]),
+        // None: sign-in is Google only (GoogleAuthController).
     ],
 
 ];

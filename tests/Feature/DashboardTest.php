@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Asset;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -18,7 +19,7 @@ class DashboardTest extends TestCase
 
     public function test_authenticated_users_can_visit_the_dashboard()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
         $this->actingAs($user);
 
         $response = $this->get(route('dashboard'));
@@ -27,10 +28,10 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_reports_asset_stats()
     {
-        \App\Models\Asset::create(['name' => 'A', 'price' => 100]);
-        \App\Models\Asset::create(['name' => 'B', 'price' => 50, 'status' => 'retired']);
+        Asset::create(['name' => 'A', 'price' => 100]);
+        Asset::create(['name' => 'B', 'price' => 50, 'status' => 'retired']);
 
-        $this->actingAs(User::factory()->create())
+        $this->actingAs(User::factory()->admin()->create())
             ->get(route('dashboard'))
             ->assertInertia(fn ($page) => $page
                 ->where('stats.total_assets', 2)
