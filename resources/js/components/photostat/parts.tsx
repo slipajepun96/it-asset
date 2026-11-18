@@ -33,7 +33,7 @@ export function Meter({ kind, value, label }: { kind: 'bw' | 'color'; value: num
                 )}
             />
             <div className="text-xs font-medium text-muted-foreground">{label ?? (kind === 'color' ? 'Colour count' : 'B&W count')}</div>
-            <div className="font-mono text-2xl font-semibold tabular-nums">{fmtNum(value)}</div>
+            <div className="font-mono text-2xl font-semibold wrap-anywhere tabular-nums">{fmtNum(value)}</div>
         </div>
     );
 }
@@ -49,9 +49,9 @@ export function StatCards({ records }: { records: PhotostatRecord[] }) {
     return (
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {stats.map(([label, value]) => (
-                <div key={label} className="rounded-xl border bg-card p-3 sm:p-4">
-                    <div className="truncate text-xs text-muted-foreground">{label}</div>
-                    <div className="truncate text-lg font-semibold tabular-nums sm:text-2xl">{fmtNum(value)}</div>
+                <div key={label} className="min-w-0 rounded-xl border bg-card p-3 sm:p-4">
+                    <div className="text-xs wrap-anywhere text-muted-foreground">{label}</div>
+                    <div className="text-lg font-semibold wrap-anywhere tabular-nums sm:text-2xl">{fmtNum(value)}</div>
                 </div>
             ))}
         </div>
@@ -98,13 +98,13 @@ export function RecordsList({
                     <li key={r.id} className="flex items-center gap-3 py-2.5">
                         <div className="min-w-0 flex-1">
                             {(showUser || showMachine) && (
-                                <div className="truncate text-sm font-medium">
+                                <div className="text-sm font-medium wrap-break-word">
                                     {[showUser && who(r), showMachine && r.machine_name].filter(Boolean).join(' · ')}
                                     {showUser && qrBadge(r)}
                                 </div>
                             )}
                             <div className="text-xs text-muted-foreground">{fmtDateTime(r.created_at)}</div>
-                            {r.purpose && <div className="truncate text-xs text-muted-foreground">{r.purpose}</div>}
+                            {r.purpose && <div className="text-xs wrap-break-word text-muted-foreground">{r.purpose}</div>}
                         </div>
                         <div className="flex shrink-0 flex-col items-end gap-1 text-sm tabular-nums">
                             {r.bw > 0 && (
@@ -140,16 +140,16 @@ export function RecordsList({
                         {records.map((r) => (
                             <tr key={r.id} className="border-b last:border-0">
                                 <td className="py-2 pr-3 whitespace-nowrap">{fmtDateTime(r.created_at)}</td>
-                                {showMachine && <td className="py-2 pr-3">{r.machine_name}</td>}
+                                {showMachine && <td className="max-w-48 py-2 pr-3 wrap-break-word">{r.machine_name}</td>}
                                 {showUser && (
-                                    <td className="py-2 pr-3">
+                                    <td className="max-w-48 py-2 pr-3 wrap-break-word">
                                         {who(r)}
                                         {qrBadge(r)}
                                     </td>
                                 )}
                                 <td className="py-2 pr-3 text-right tabular-nums">{r.bw ? fmtNum(r.bw) : '–'}</td>
                                 <td className="py-2 pr-3 text-right tabular-nums">{r.color ? fmtNum(r.color) : '–'}</td>
-                                <td className="max-w-64 truncate py-2 pr-3 text-muted-foreground" title={r.purpose}>
+                                <td className="max-w-64 py-2 pr-3 wrap-break-word text-muted-foreground">
                                     {r.purpose}
                                 </td>
                                 {onDelete && <td>{del(r)}</td>}

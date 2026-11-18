@@ -63,10 +63,10 @@ export default function Machines({ machines, readings, assets }: Props) {
                                         <button type="button" onClick={() => setEditing(m)}
                                             className={`flex min-w-0 flex-1 items-center gap-3 py-3 text-left ${m.active ? '' : 'opacity-60'}`}>
                                             <div className="min-w-0 flex-1">
-                                                <div className="truncate font-medium">
+                                                <div className="font-medium wrap-break-word">
                                                     {m.name} {!m.active && <Badge variant="secondary">Hidden</Badge>}
                                                 </div>
-                                                {m.location && <div className="truncate text-xs text-muted-foreground">{m.location}</div>}
+                                                {m.location && <div className="text-xs wrap-break-word text-muted-foreground">{m.location}</div>}
                                                 <div className="mt-1 flex gap-4 text-sm tabular-nums">
                                                     <span><span className="text-xs text-muted-foreground">B&amp;W</span> <b className="font-mono">{fmtNum(m.bw_counter)}</b></span>
                                                     <span><span className="text-xs text-muted-foreground">Colour</span> <b className="font-mono">{fmtNum(m.color_counter)}</b></span>
@@ -345,7 +345,7 @@ function Readings({ readings }: { readings: MeterReading[] }) {
                         {readings.map((r) => (
                             <li key={r.id} className="flex items-start gap-2 py-3">
                                 <div className="min-w-0 flex-1 space-y-1">
-                                    <div className="truncate text-sm font-medium">{r.machine_name}</div>
+                                    <div className="text-sm font-medium wrap-break-word">{r.machine_name}</div>
                                     <div className="text-xs text-muted-foreground">{fmtDateTime(r.created_at)} · {r.created_by_name}</div>
                                     {r.initial ? (
                                         <div className="text-sm">
@@ -357,7 +357,7 @@ function Readings({ readings }: { readings: MeterReading[] }) {
                                             <div className="flex flex-wrap items-center gap-2">Colour <b className="font-mono">{fmtNum(r.color_reading)}</b> <Diff value={r.color_diff} /></div>
                                         </div>
                                     )}
-                                    {r.note && !r.initial && <div className="truncate text-xs text-muted-foreground">{r.note}</div>}
+                                    {r.note && !r.initial && <div className="text-xs wrap-break-word text-muted-foreground">{r.note}</div>}
                                 </div>
                                 {undoButton(r)}
                             </li>
@@ -382,7 +382,7 @@ function Readings({ readings }: { readings: MeterReading[] }) {
                                     <td className="py-2 pr-3 whitespace-nowrap">{fmtDateTime(r.created_at)}</td>
                                     <td className="py-2 pr-3">
                                         {r.machine_name}
-                                        {r.note && <div className="max-w-48 truncate text-xs text-muted-foreground" title={r.note}>{r.note}</div>}
+                                        {r.note && <div className="max-w-48 text-xs wrap-break-word text-muted-foreground">{r.note}</div>}
                                     </td>
                                     <td className="py-2 pr-3 text-right font-mono tabular-nums">{fmtNum(r.bw_reading)}</td>
                                     <td className="py-2 pr-3">{r.initial ? <span className="text-muted-foreground">–</span> : <Diff value={r.bw_diff} />}</td>

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offline - IT Asset MS</title>
+<style>
+    :root { color-scheme: light dark; --bg: #f6faf3; --fg: #0f2e1a; --muted: #5b6b60; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #0f1a12; --fg: #e8f2e3; --muted: #9fb0a4; } }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--fg);
+        font: 16px/1.5 system-ui, -apple-system, sans-serif; padding: 16px; box-sizing: border-box; text-align: center; }
+    p { color: var(--muted); max-width: 32ch; margin: 8px auto 20px; }
+    button { font: inherit; font-weight: 600; padding: 10px 20px; border: 0; border-radius: 8px; background: #a3e635; color: #0f2e1a; cursor: pointer; }
+</style>
+</head>
+<body>
+<main>
+    <img src="/icons/icon-192.png" alt="" width="72" height="72">
+    <h1>You're offline</h1>
+    <p>Check your connection, then try again.</p>
+    <button onclick="location.reload()">Try again</button>
+</main>
+</body>
+</html>
